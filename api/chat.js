@@ -1,36 +1,34 @@
-// /api/chat.js
+import { Configuration, OpenAIApi } from 'openai';
+import joeKnowledge from '../joe-knowledge.json';
+
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Only POST requests allowed' });
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
   }
 
   const { message } = req.body;
-  const knowledge = require('../joe-knowledge.json');
 
-  const { Configuration, OpenAIApi } = await import('openai');
-  const configuration = new Configuration({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
-  const openai = new OpenAIApi(configuration);
-
-  const context = Object.entries(knowledge)
-    .map(([k, v]) => `${k}: ${v}`)
-    .join('\n');
-
-  const prompt = `You are JOE, the Joy of Expression, Acrylicize’s creative co-pilot.\n\nKnowledge:\n${context}\n\nUser: ${message}\nJOE:`;
+  const prompt = \`
+You are JOE, the Joy of Expression, Acrylicize’s creative co-pilot. Here’s what you know:
+\${JSON.stringify(joeKnowledge, null, 2)}
+Respond to: "\${message}"
+\`;
 
   try {
-    const response = await openai.createCompletion({
-      model: 'text-davinci-003',
-      prompt,
-      max_tokens: 150,
+    const completion = await openai.createChatCompletion({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: prompt }],
     });
 
-    const reply = response.data.choices[0].text.trim();
-    res.status(200).json({ reply });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Something went wrong with OpenAI' });
+    res.status(200).json({ reply: completion.data.choices[0].message.content });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Something went wrong.' });
   }
 }
