@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>JOE – Joy of Expression</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;500;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Work Sans', sans-serif;
+      background: #fefefe;
+      color: #1a1a1a;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    h1 {
+      font-weight: 700;
+      font-size: 2.5em;
+      margin-bottom: 0.5em;
+    }
+
+    .chat-box {
+      width: 90%;
+      max-width: 600px;
+      height: 50vh;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 1em;
+      margin-bottom: 1em;
+      background: white;
+      border-radius: 8px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0.5em;
+      justify-content: center;
+    }
+
+    input {
+      padding: 0.7em;
+      width: 70%;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 0.7em 1.2em;
+      background: black;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    button:hover {
+      background: #333;
+    }
+
+    .message {
+      margin: 0.5em 0;
+      text-align: left;
+    }
+
+    .user {
+      font-weight: bold;
+    }
+
+    .bot {
+      margin-left: 1em;
+      color: #444;
+    }
+
+    footer {
+      position: absolute;
+      bottom: 20px;
+      font-size: 0.8em;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>JOE</h1>
+  <p class="tagline">Your creative co-pilot at Acrylicize</p>
+
+  <div class="chat-box" id="chat"></div>
+
+  <div class="input-row">
+    <input type="text" id="userInput" placeholder="Ask JOE something..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <footer>Acrylicize R&D – 2025</footer>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("userInput");
+      const chat = document.getElementById("chat");
+      const message = input.value;
+
+      if (!message) return;
+
+      chat.innerHTML += `<div class='message'><span class='user'>You:</span> ${message}</div>`;
+      input.value = "";
+
+      const res = await fetch('https://your-vercel-url.vercel.app/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await res.json();
+      chat.innerHTML += `<div class='message'><span class='bot'>JOE:</span> ${data.reply}</div>`;
+      chat.scrollTop = chat.scrollHeight;
+    }
+  </script>
+
+</body>
+</html>
