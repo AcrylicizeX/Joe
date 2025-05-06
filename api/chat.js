@@ -1,19 +1,21 @@
-const OpenAI = require("openai");
-const knowledge = require("../joe-knowledge.json");
-
-// Set up OpenAI with your API key from environment variables
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
-
 module.exports = async function handler(req, res) {
+  // Allow CORS preflight
+  if (req.method === "OPTIONS") {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    return res.status(200).end();
+  }
+
+  // Only allow POST for actual processing
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Only POST requests allowed" });
   }
 
+  res.setHeader("Access-Control-Allow-Origin", "*");
+
   const { message } = req.body;
 
-  // Check against local knowledge first
   const match = knowledge.find(entry =>
     message.toLowerCase().includes(entry.question.toLowerCase())
   );
@@ -28,7 +30,7 @@ module.exports = async function handler(req, res) {
       messages: [
         {
           role: "system",
-          content: "You are JOE, Joy of Expression, Acrylicize’s creative co-pilot. Be insightful, energetic, and inspiring."
+          content: "You are JOE, Joy of Expression, Acrylicize’s creative co-pilot..."
         },
         {
           role: "user",
