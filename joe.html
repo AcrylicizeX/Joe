@@ -113,7 +113,7 @@
       chat.innerHTML += `<div class='message'><span class='user'>You:</span> ${message}</div>`;
       input.value = "";
 
-      const res = await fetch('https://your-vercel-url.vercel.app/api/chat', {
+      const res = await fetch('https://joe-nine.vercel.app/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message })
