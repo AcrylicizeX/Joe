@@ -6,14 +6,13 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Only POST requests allowed" });
   }
 
   const { message } = req.body;
 
-  // Simple keyword match in the JSON knowledge base
   const match = knowledge.find(entry =>
     message.toLowerCase().includes(entry.question.toLowerCase())
   );
@@ -37,4 +36,4 @@ module.exports = async (req, res) => {
     console.error("OpenAI error:", error);
     res.status(500).json({ error: "Something went wrong." });
   }
-};
+}
